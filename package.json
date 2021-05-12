@@ -1,0 +1,17 @@
+{
+  "name": "assignment2-1",
+  "version": "1.0.0",
+  "description": "\"2학년 1학기 기말과제\"",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app"
+  },
+  "author": "pdj",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
