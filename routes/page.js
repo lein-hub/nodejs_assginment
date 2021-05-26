@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const { Post, User } = require('../models');
+const { CLIEngine } = require('eslint');
 
 router.use((req, res, next) => {
   // 라우터에서 사용되는 미들웨어 정의
@@ -30,8 +32,23 @@ router.get('/global', (req, res) => {
   res.render('global', { title: '현지학기제 - NodeBird' });
 }); // GET /global 요청 처리
 
-router.get('/qna', isLoggedIn, (req, res) => {
-  res.render('qna', { title: '자주 묻는 질문 - NodeBird' });
+router.get('/qna', isLoggedIn, async (req, res) => {
+  try {
+    const posts = await Post.findAll({
+      include: {
+        model: User,
+        attributes: ['id', 'nick'],
+      },
+      order: [['createdAt', 'DESC']],
+    });
+    res.render('qna', {
+      title: '자주 묻는 질문 - NodeBird',
+      posts,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 }); // GET /qna 요청 처리
 
 router.get('/', (req, res, next) => {

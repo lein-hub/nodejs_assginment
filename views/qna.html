@@ -1,9 +1,16 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-{% if user and user.id %}
-<div class="textArea">궁금한것이 있다면 물어보세요</div>
-{% else %}
-<div class="textArea">로그인 후에 보실 수 있습니다.</div>
-{% endif %}
+<div class="qnaContainer">
+    <div class="qnaTitle">궁금한것이 있다면 물어보세요</div>
+    {% for post in posts %}
+      <div class="post">
+        <input type="hidden" value="{{post.User.id}}" class="post-user-id">
+        <input type="hidden" value="{{post.id}}" class="post-id">
+        <a href=""><div class="post-author">{{post.title}}</div></a>
+        <div class="post-content">{{post.User.nick}}</div>
+      </div>
+    {% endfor %}
+</div>
+
 {% endblock %}
