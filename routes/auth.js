@@ -8,13 +8,13 @@ const router = express.Router();
 
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
   // POST /auth/join
-  const { email, nick, password } = req.body; // 237p 이후로 참고
+  const { email, nick, pw } = req.body; // 237p 이후로 참고
   try {
     const exUser = await User.findOne({ where: { email } });
     if (exUser) {
       return res.redirect('/join?error=exist');
     }
-    const hash = await bcrypt.hash(password, 12); // bcrypt.hash(평문, 반복횟수);
+    const hash = await bcrypt.hash(pw, 12); // bcrypt.hash(평문, 반복횟수);
     // 암호화 반복횟수 12회
     await User.create({
       // sequelize 로 users 한 row 생성

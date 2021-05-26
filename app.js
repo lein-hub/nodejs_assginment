@@ -60,7 +60,7 @@ sequelize
   });
 
 // app.use(morgan('dev'));
-// app.use('/', express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -86,11 +86,6 @@ app.use(passport.session());
 
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
-
-app.use((req, res, next) => {
-  console.log('모든 요청에 다 실행됩니다.');
-  next();
-});
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

@@ -22,6 +22,18 @@ router.get('/join', isNotLoggedIn, (req, res) => {
   res.render('join', { title: '회원가입 - NodeBird' });
 }); // GET /join 요청 처리
 
+router.get('/bio', (req, res) => {
+  res.render('bio', { title: '자기소개 - NodeBird' });
+}); // GET /bio 요청 처리
+
+router.get('/global', (req, res) => {
+  res.render('global', { title: '현지학기제 - NodeBird' });
+}); // GET /global 요청 처리
+
+router.get('/qna', isLoggedIn, (req, res) => {
+  res.render('qna', { title: '자주 묻는 질문 - NodeBird' });
+}); // GET /qna 요청 처리
+
 router.get('/', (req, res, next) => {
   const twits = [];
   res.render('main', {
