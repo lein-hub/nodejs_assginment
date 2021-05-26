@@ -51,6 +51,10 @@ router.get('/qna', isLoggedIn, async (req, res) => {
   }
 }); // GET /qna 요청 처리
 
+router.get('/write', isLoggedIn, (req, res) => {
+  res.render('write', { title: '자주 묻는 질문 - NodeBird' });
+}); // GET /write 요청 처리
+
 router.get('/', (req, res, next) => {
   const twits = [];
   res.render('main', {

@@ -11,6 +11,11 @@
         <div class="post-content">{{post.User.nick}}</div>
       </div>
     {% endfor %}
+    <div>
+      <form id="write-qna" action="/write" method="get">
+      <button id="write-btn", type="menu" class="btn">글쓰기</button>
+      </form>
+    </div>
 </div>
 
 {% endblock %}
