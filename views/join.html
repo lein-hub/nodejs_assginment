@@ -1,59 +1,79 @@
-{% extends 'layout.html' %}
-
-{% block content %}
-
-<form>
-  <div class="row justify-content-center">
-    <div class="col-md-3">
-      <label for="inputEmail4" class="form-label">Email</label>
-      <input type="email" class="form-control" id="join-email" placeholder="이메일" required>
-    </div>
-    <div class="col-md-3">
-      <label for="inputAddress" class="form-label">Nickname</label>
-      <input type="text" class="form-control" id="join-nick" placeholder="별명" required>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-  <div class="col-md-6">
-    <label for="inputPassword4" class="form-label">Password</label>
-    <input type="password" class="form-control" id="join-password" placeholder="비밀번호" required>
-  </div>
-</div>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <label for="inputPassword4" class="form-label">Password Confirm</label>
-    <input type="password" class="form-control" id="join-password2" placeholder="비밀번호 확인" required>
-  </div>
-  <div class="row justify-content-center">
-  <div class="col-6">
-    <button type="submit" class="btn btn-primary">Sign in</button>
-  </div>
-</div>
-</div>
-</form>
-
-  <!-- <div class="timeline">
-    <form id="join-form" action="/auth/join" method="post">
-      <div class="input-group">
-        <label for="join-email">이메일</label>
-        <input id="join-email" type="email" name="email"></div>
-      <div class="input-group">
-        <label for="join-nick">닉네임</label>
-        <input id="join-nick" type="text" name="nick"></div>
-      <div class="input-group">
-        <label for="join-password">비밀번호</label>
-        <input id="join-password" type="password" name="pw">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+<body>
+  <div class="text-center mt-5">
+  <form id="join-form col-md-5 m-auto" action="/auth/join" method="post">
+    <a href="/"><img class="mb-4" src="/public/logo.png" alt="logo" width="100"></a>
+              <h1 class="h3 mb-3 fw-normal">Sign-up</h1>
+    <div class="row justify-content-center">
+      <div class="col-md-3">
+        <label for="inputEmail4" class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" id="join-email" placeholder="이메일" required>
       </div>
-      <button id="join-btn" type="submit" class="btn">회원가입</button>
-    </form>
-  </div> -->
-  {% endblock %}
-  {% block script %}
-  <script>
-    window.onload = () => {
-      if (new URL(location.href).searchParams.get('error')) {
-        alert('이미 존재하는 이메일입니다.');
+      <div class="col-md-3">
+        <label for="inputAddress" class="form-label">Nickname</label>
+        <input type="text" name="nick" class="form-control" id="join-nick" placeholder="별명" required>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <label for="inputPassword4" class="pw form-label">Password</label>
+        <input type="password" name="pw" class="form-control" id="join-password1" placeholder="비밀번호" required>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <label for="inputPassword4" class="pw form-label">Password Confirm</label>
+        <input type="password" class="form-control" id="join-password2" placeholder="비밀번호 확인" required>
+      </div>
+    </div>
+    <div class="row justify-content-center mt-3">
+      <div class="col-6 justify-content-end">
+        <input id="join-btn" type="submit" onclick="return test()" class="btn btn-primary" value="Sign up">
+        <p class="mt-5 mb-3 text-muted">© lein-hub 2020–2021</p>
+      </div>
+    </div>
+  </form>
+</div>
+  
+    <!-- <div class="timeline">
+      <form id="join-form" action="/auth/join" method="post">
+        <div class="input-group">
+          <label for="join-email">이메일</label>
+          <input id="join-email" type="email" name="email"></div>
+        <div class="input-group">
+          <label for="join-nick">닉네임</label>
+          <input id="join-nick" type="text" name="nick"></div>
+        <div class="input-group">
+          <label for="join-password">비밀번호</label>
+          <input id="join-password" type="password" name="pw">
+        </div>
+        <button id="join-btn" type="submit" class="btn">회원가입</button>
+      </form>
+    </div> -->
+    <script type="text/javascript">
+      function test() {
+        var p1 = document.getElementById('join-password1').value;
+        var p2 = document.getElementById('join-password2').value;
+        if( p1 != p2 ) {
+          alert("비밀번호가 일치 하지 않습니다");
+          return false;
+        }
       }
-    };
-  </script>
-  {% endblock %}
+    </script>
+    <script>
+      window.onload = () => {
+        if (new URL(location.href).searchParams.get('error')) {
+          alert('이미 존재하는 이메일입니다.');
+        }
+      };
+    </script>
+</body>
+</html>

@@ -11,17 +11,9 @@
   height: 20px;
 }
 
-.carousel-control-prev {
-  left:1%;
-}
-
-.carousel-control-next {
-  left: 65%;
-}
-
-.carousel-indicators {
-  left: 10%;
-}
+/* .carousel-control-prev {
+  width:70%;
+} */
 /* html, body { margin: 0; padding: 0; height: 100%; }
 .btn {
   display: inline-block;

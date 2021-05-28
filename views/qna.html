@@ -3,19 +3,74 @@
 {% block content %}
 <div class="qnaContainer">
     <div class="qnaTitle">궁금한것이 있다면 물어보세요</div>
+    <table class="table table-hover">
+      <caption>List of users</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">제목</th>
+      <th scope="col">글쓴이</th>
+      <th scope="col">날짜</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- <div class="post">
+      <input type="hidden" value="{{post.User.id}}" class="post-user-id">
+      <input type="hidden" value="{{post.id}}" class="post-id">
+      <a href=""><div class="d-inline-block post-author">{{post.title}}</div></a>
+      <div class="d-inline-block post-content">{{post.User.nick}}</div>
+    </div> -->
     {% for post in posts %}
-      <div class="post">
-        <input type="hidden" value="{{post.User.id}}" class="post-user-id">
-        <input type="hidden" value="{{post.id}}" class="post-id">
-        <a href=""><div class="d-inline-block post-author">{{post.title}}</div></a>
-        <div class="d-inline-block post-content">{{post.User.nick}}</div>
-      </div>
+      <tr>
+        <th scope="row">{{post.id}}</th>
+        <td><a href="/qna/{{post.id}}">{{post.title}}</a></td>
+        <td>{{post.User.nick}}</td>
+        <td>date_to_str({{post.createdAt}})</td>
+      </tr>
     {% endfor %}
+  </tbody>
+</table>
+    
     <div>
       <form id="write-qna" action="/write" method="get">
-      <button id="write-btn", type="menu" class="btn">글쓰기</button>
+      <button id="write-btn", type="menu" class="btn btn-primary">글쓰기</button>
       </form>
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+function date_to_str(format)
+{
+
+    var year = format.getFullYear();
+
+    var month = format.getMonth() + 1;
+
+    if(month<10) month = '0' + month;
+
+    var date = format.getDate();
+
+    if(date<10) date = '0' + date;
+
+    var hour = format.getHours();
+
+    if(hour<10) hour = '0' + hour;
+
+    var min = format.getMinutes();
+
+    if(min<10) min = '0' + min;
+
+    var sec = format.getSeconds();
+
+    if(sec10) sec = '0' + sec;
+
+    
+
+    return year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
+
+}
+</script>
 {% endblock %}

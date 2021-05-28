@@ -4,7 +4,11 @@ exports.isLoggedIn = (req, res, next) => {
     // 인증되었으면 true, 그렇지 않으면 false
     next();
   } else {
-    res.status(403).send('로그인 필요');
+    // res.status(403).send('로그인 필요');
+    res.render('login', {
+      title: '로그인 - NodeBird',
+      menu: 'Menu',
+    });
   }
 };
 

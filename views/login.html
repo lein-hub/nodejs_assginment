@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+<body>
+    <div class="text-center mt-5">
+        <main class="form-signin">
+            <form class="col-md-5 m-auto" action="/auth/login" method="post">
+              <a href="/"><img class="mb-4" src="/public/logo.png" alt="logo" width="100"></a>
+              <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+          
+              <div class="form-floating">
+                <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com">
+                <label for="floatingInput">Email address</label>
+              </div>
+              <div class="form-floating">
+                <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
+                <label for="floatingPassword">Password</label>
+              </div>
+              <button class="w-100 btn btn-lg btn-primary mt-5" type="submit">Sign in</button>
+              <p class="mt-5 mb-3 text-muted">© lein-hub 2020–2021</p>
+            </form>
+          </main>
+        </div>
+</body>
+</html>

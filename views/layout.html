@@ -20,7 +20,7 @@
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Menu
+                  {{menu}}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                   <li><a class="dropdown-item" href="/bio">자기소개</a></li>
@@ -33,7 +33,7 @@
           {% if user and user.id %}
             <div class="user-name d-inline text-light me-3">{{'안녕하세요! '}}<a href="/profile" class="d-inline-block text-primary">{{user.nick}}</a>님</div>
           <input id="my-id" type="hidden" value="{{user.id}}">
-          <a id="d-inline logout" href="/auth/logout" class="btn text-dark bg-light rounded-pill">Log out</a>
+          <a id="d-inline logout" href="/auth/logout" class="btn btn-outline-light my-auto">Log out</a>
         {% else %}
         <form id="login-form" class="justify-content-end" action="/auth/login" method="post">
         <div class="form-floating mb-0" id="login-panel">
@@ -41,7 +41,7 @@
           <label for="floatingInput"></label>
           <input type="password" name="password" class="form-control-sm" id="floatingPassword" placeholder="Password">
           <label for="floatingPassword"></label>
-          <button id="login" type="submit" class="btn btn-outline-light">Log in</button>
+          <button id="login" type="submit" class="btn btn-outline-light my-auto">Log in</button>
         </div>
         <div class="login-panel-text text-light">회원이 아니신가요? <a id="join" href="/join" class="text-primary">여기</a>를 눌러주세요</div>
         </form>

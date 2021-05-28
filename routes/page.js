@@ -25,11 +25,17 @@ router.get('/join', isNotLoggedIn, (req, res) => {
 }); // GET /join 요청 처리
 
 router.get('/bio', (req, res) => {
-  res.render('bio', { title: '자기소개 - NodeBird' });
+  res.render('bio', {
+    title: '자기소개 - NodeBird',
+    menu: '자기소개',
+  });
 }); // GET /bio 요청 처리
 
 router.get('/global', (req, res) => {
-  res.render('global', { title: '현지학기제 - NodeBird' });
+  res.render('global', {
+    title: '현지학기제 - NodeBird',
+    menu: '현지학기제',
+  });
 }); // GET /global 요청 처리
 
 router.get('/qna', isLoggedIn, async (req, res) => {
@@ -43,6 +49,7 @@ router.get('/qna', isLoggedIn, async (req, res) => {
     });
     res.render('qna', {
       title: '자주 묻는 질문 - NodeBird',
+      menu: 'Q & A',
       posts,
     });
   } catch (error) {
@@ -52,15 +59,19 @@ router.get('/qna', isLoggedIn, async (req, res) => {
 }); // GET /qna 요청 처리
 
 router.get('/write', isLoggedIn, (req, res) => {
-  res.render('write', { title: '자주 묻는 질문 - NodeBird' });
+  res.render('write', {
+    title: '자주 묻는 질문 - NodeBird',
+    menu: 'Q & A',
+  });
 }); // GET /write 요청 처리
 
 router.get('/', (req, res, next) => {
   const twits = [];
   res.render('main', {
     // main.html 화면 만들어라
-    title: 'NodeBird',
+    title: '메인 - NodeBird',
     twits,
+    menu: 'Menu',
   });
 }); // GET / 요청 처리
 
