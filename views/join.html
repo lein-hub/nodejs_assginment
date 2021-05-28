@@ -1,13 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>익스프레스 서버</title>
-</head>
-<body>
-  <div class="timeline">
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<form>
+  <div class="row justify-content-center">
+    <div class="col-md-3">
+      <label for="inputEmail4" class="form-label">Email</label>
+      <input type="email" class="form-control" id="join-email" placeholder="이메일" required>
+    </div>
+    <div class="col-md-3">
+      <label for="inputAddress" class="form-label">Nickname</label>
+      <input type="text" class="form-control" id="join-nick" placeholder="별명" required>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Password</label>
+    <input type="password" class="form-control" id="join-password" placeholder="비밀번호" required>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Password Confirm</label>
+    <input type="password" class="form-control" id="join-password2" placeholder="비밀번호 확인" required>
+  </div>
+  <div class="row justify-content-center">
+  <div class="col-6">
+    <button type="submit" class="btn btn-primary">Sign in</button>
+  </div>
+</div>
+</div>
+</form>
+
+  <!-- <div class="timeline">
     <form id="join-form" action="/auth/join" method="post">
       <div class="input-group">
         <label for="join-email">이메일</label>
@@ -21,7 +46,9 @@
       </div>
       <button id="join-btn" type="submit" class="btn">회원가입</button>
     </form>
-  </div>
+  </div> -->
+  {% endblock %}
+  {% block script %}
   <script>
     window.onload = () => {
       if (new URL(location.href).searchParams.get('error')) {
@@ -29,5 +56,4 @@
       }
     };
   </script>
-</body>
-</html>
+  {% endblock %}

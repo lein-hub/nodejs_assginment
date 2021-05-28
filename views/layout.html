@@ -5,41 +5,62 @@
     <title>{{title}}</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="/public/main.css">
   </head>
   <body>
     <div class="container">
-      <div class="profile-wrap">
-        <div class="profile">
+      <nav class="navbar navbar-expand-lg navbar-expand-md navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Node.js Assignment Page</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Menu
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                  <li><a class="dropdown-item" href="/bio">자기소개</a></li>
+                  <li><a class="dropdown-item" href="/global">현지학기제</a></li>
+                  <li><a class="dropdown-item" href="/qna">Q & A</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
           {% if user and user.id %}
-            <div class="user-name">{{'안녕하세요! ' + user.nick + '님'}}</div>
+            <div class="user-name d-inline text-light me-3">{{'안녕하세요! '}}<a href="/profile" class="d-inline-block text-primary">{{user.nick}}</a>님</div>
           <input id="my-id" type="hidden" value="{{user.id}}">
-          <a id="my-profile" href="/profile" class="btn">내 프로필</a>
-          <a id="logout" href="/auth/logout" class="btn">로그아웃</a>
+          <a id="d-inline logout" href="/auth/logout" class="btn text-dark bg-light rounded-pill">Log out</a>
         {% else %}
-          <form id="login-form" action="/auth/login" method="post">
-            <div class="input-group">
-              <label for="email">이메일</label>
-              <input id="email" type="email" name="email" required autofocus>
-            </div>
-            <div class="input-group">
-              <label for="password">비밀번호</label>
-              <input id="password" type="password" name="password" required>
-            </div>
-            <a id="join" href="/join" class="btn">회원가입</a>
-            <button id="login" type="submit" class="btn">로그인</button>
-          </form>
+        <form id="login-form" class="justify-content-end" action="/auth/login" method="post">
+        <div class="form-floating mb-0" id="login-panel">
+          <input type="email" name="email" class="form-control-sm" id="floatingInput" placeholder="ID">
+          <label for="floatingInput"></label>
+          <input type="password" name="password" class="form-control-sm" id="floatingPassword" placeholder="Password">
+          <label for="floatingPassword"></label>
+          <button id="login" type="submit" class="btn btn-outline-light">Log in</button>
+        </div>
+        <div class="login-panel-text text-light">회원이 아니신가요? <a id="join" href="/join" class="text-primary">여기</a>를 눌러주세요</div>
+        </form>
         {% endif %}
         </div>
+      </nav>
+      <div class="profile-wrap">
+        <div class="profile">
+          
+        </div>
       </div>
-      <nav class="mainlink">
+      <!-- <nav class="mainlink">
         <a href="/"><img src="./yjlogo.png" alt="배너"></a>
         <ul>
             <li><a href="/bio">자기소개</a></li>
             <li><a href="/global">현지학기제</a></li>
             <li><a href="/qna">Q & A</a></li>
         </ul>
-      </nav>
+      </nav> -->
       {% block content %}
       {% endblock %}
     </div>
@@ -51,6 +72,8 @@
         }
       };
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    
     {% block script %}
     {% endblock %}
   </body>

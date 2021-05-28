@@ -42,7 +42,7 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
       img: req.body.url,
       UserId: req.user.id,
     });
-    res.redirect('/');
+    res.redirect('/qna');
   } catch (error) {
     console.error(error);
     next(error);
