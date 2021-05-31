@@ -1,36 +1,20 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Post extends Sequelize.Model {
+module.exports = class Comment extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        title: {
-          type: Sequelize.STRING(60),
-          allowNull: false,
-        },
         content: {
-          type: Sequelize.STRING(1000), // 트위터처럼 140자 나타내기
+          type: Sequelize.STRING(140),
           allowNull: false,
-        },
-        img: {
-          type: Sequelize.STRING(200),
-          allowNull: true,
-        },
-        good: {
-          type: Sequelize.INTEGER(8),
-          allowNull: true,
-        },
-        bad: {
-          type: Sequelize.INTEGER(8),
-          allowNull: true,
         },
       },
       {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: 'Post',
-        tableName: 'posts',
+        modelName: 'Comment',
+        tableName: 'Comments',
         paranoid: false, // deletedAt 안생김
         charset: 'utf8mb4',
         collate: 'utf8mb4_general_ci',

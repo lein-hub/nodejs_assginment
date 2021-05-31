@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="head border-bottom mt-5">
+    <p class="col-md-10 h1 d-inline-block">{{post.title}}</p>
+    <div class="justify-content-end col-md-2 d-inline">{{date}}</div>
+</div>
+
+
+<p>작성자: {{post.User.nick}}</p>
+<pre>{{post.content}}</pre>
+<div class="recbox text-center mt-5 pb-4 border-bottom">
+    <form action="recommend" action="" method="post">
+        <button type="button" id="pos" class="recbtn btn btn-primary btn-lg">추천<br>0</button>
+        <button type="button" id="neg" class="recbtn btn btn-danger btn-lg">비추천<br>0</button>
+    </form>
+</div>
+
+<form id="write-qna" action="/write" method="get">
+    <button id="write-btn", type="menu" class="btn btn-primary">글쓰기</button>
+    </form>
+{% endblock %}
+
+{% block script %}
+<script>
+document.querySelector('#pos').addEventListener("click", recommend);
+document.querySelector('#neg').addEventListener("click", recommend);
+
+function recommend() {
+  alert ("Hello World!");
+}
+</script>
+{% endscript %}

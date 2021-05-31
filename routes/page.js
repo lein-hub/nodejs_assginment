@@ -1,7 +1,7 @@
 const express = require('express');
-
+const { Op } = require('sequelize');
 const router = express.Router();
-
+const dayjs = require('dayjs');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const { Post, User } = require('../models');
 const { CLIEngine } = require('eslint');
@@ -38,19 +38,63 @@ router.get('/global', (req, res) => {
   });
 }); // GET /global 요청 처리
 
-router.get('/qna', isLoggedIn, async (req, res) => {
+router.get('/qna', isLoggedIn, async (req, res, next) => {
   try {
-    const posts = await Post.findAll({
+    let pageNum = req.query.page; // 요청 페이지 넘버
+    let offset = 0;
+    let counts = [];
+    const postNum = 20;
+    const end = (await Post.findAndCountAll()).count / (postNum + 1);
+    for (let i = 0; i <= end; i++) counts[i] = i + 1;
+
+    if (pageNum > 1) {
+      offset = postNum * (pageNum - 1);
+    }
+
+    let posts = await Post.findAll({
       include: {
         model: User,
         attributes: ['id', 'nick'],
       },
       order: [['createdAt', 'DESC']],
+      offset: offset,
+      limit: postNum,
+    });
+    posts = posts.map(post => {
+      post.dataValues.createdAt = dayjs(post.dataValues.createdAt).format(
+        'YYYY-MM-DD',
+      );
+      return post;
     });
     res.render('qna', {
       title: '자주 묻는 질문 - NodeBird',
       menu: 'Q & A',
       posts,
+      counts,
+      page: pageNum,
+    });
+    console.log(end);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+}); // GET /qna 요청 처리
+
+router.get('/qna/:postId', isLoggedIn, async (req, res, next) => {
+  try {
+    const post = await Post.findOne({
+      include: {
+        model: User,
+        attributes: ['id', 'nick'],
+      },
+      where: { id: req.params.postId },
+    });
+    const date = dayjs(post.createdAt).format('YYYY-MM-DD');
+    res.render('content', {
+      title: '자주 묻는 질문 - NodeBird',
+      menu: 'Q & A',
+      post,
+      date,
     });
   } catch (error) {
     console.error(error);
@@ -66,11 +110,9 @@ router.get('/write', isLoggedIn, (req, res) => {
 }); // GET /write 요청 처리
 
 router.get('/', (req, res, next) => {
-  const twits = [];
   res.render('main', {
     // main.html 화면 만들어라
     title: '메인 - NodeBird',
-    twits,
     menu: 'Menu',
   });
 }); // GET / 요청 처리
