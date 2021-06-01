@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const router = express.Router();
 const dayjs = require('dayjs');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
-const { Post, User } = require('../models');
+const { Post, User, Comment } = require('../models');
 const { CLIEngine } = require('eslint');
 
 router.use((req, res, next) => {
@@ -38,7 +38,7 @@ router.get('/global', (req, res) => {
   });
 }); // GET /global 요청 처리
 
-router.get('/qna', isLoggedIn, async (req, res, next) => {
+router.get('/qna', async (req, res, next) => {
   try {
     let pageNum = req.query.page; // 요청 페이지 넘버
     let offset = 0;
@@ -80,7 +80,7 @@ router.get('/qna', isLoggedIn, async (req, res, next) => {
   }
 }); // GET /qna 요청 처리
 
-router.get('/qna/:postId', isLoggedIn, async (req, res, next) => {
+router.get('/qna/:postId', async (req, res, next) => {
   try {
     const post = await Post.findOne({
       include: {
@@ -101,6 +101,19 @@ router.get('/qna/:postId', isLoggedIn, async (req, res, next) => {
     next(error);
   }
 }); // GET /qna 요청 처리
+
+router.post('/qna/:postId/comment', async (req, res, next) => {
+  try {
+    const comment = await Comment.create({
+      content: req.body.content,
+      UserId: req.user.id,
+      PostId: req.params.postId,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
 
 router.get('/write', isLoggedIn, (req, res) => {
   res.render('write', {

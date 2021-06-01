@@ -16,9 +16,13 @@
     </form>
 </div>
 
-<form id="write-qna" action="/write" method="get">
-    <button id="write-btn", type="menu" class="btn btn-primary">글쓰기</button>
+<div class="commentBox">
+    <form action="/qna/{{post.id}}/comment" method="post">
+        <label for="exampleFormControlTextarea1" class="form-label">댓글 쓰기</label>
+        <textarea class="form-control d-inline" name="content" id="exampleFormControlTextarea1" rows="2" required></textarea>
+        <button type="submit" class="btn btn-primary">등록</button>
     </form>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -30,4 +34,4 @@ function recommend() {
   alert ("Hello World!");
 }
 </script>
-{% endscript %}
+{% endblock %}

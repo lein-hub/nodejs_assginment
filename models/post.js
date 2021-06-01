@@ -41,5 +41,6 @@ module.exports = class Post extends Sequelize.Model {
   static associate(db) {
     db.Post.belongsTo(db.User); // 게시글은 유저모델에 대해 N : 1 -> belongsTo
     // post.getUser(), post.addUser() 사용 가능해짐
+    db.Post.hasMany(db.Comment);
   }
 };
