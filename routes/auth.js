@@ -51,6 +51,45 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
   })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
 });
 
+router.post('/profile', isLoggedIn, async (req, res, next) => {
+  passport.authenticate('local', (authError, user, info) => {
+    // passport.authenticate(로그인 전략 설정, 콜백);
+    if (authError) {
+      console.error(authError);
+      return next(authError);
+    }
+    if (!user) {
+      return res.redirect(`/?loginError=${info.message}`);
+    }
+    return req.login(user, loginError => {
+      // passport.serializeUser() 메소드가 호출된다.
+      if (loginError) {
+        console.error(loginError);
+        return next(loginError);
+      }
+    });
+  })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
+
+  const user = await User.update(
+    {
+      nick: req.body.nick,
+      snsId: req.body.snsId == '' ? null : req.body.snsId,
+      snsProvider: req.body.snsProvider == '선택' ? null : req.body.snsProvider,
+    },
+    {
+      where: { id: req.user.id },
+    },
+    console.log(req.body.snsPr),
+    res.redirect('/'),
+  )
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+});
+
 router.get('/logout', isLoggedIn, (req, res) => {
   // GET /auth/logout
   req.logout();

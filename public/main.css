@@ -49,3 +49,7 @@
 .recbtn {
   width: 100px;
 }
+
+.commentsBox span {
+  font-size: small;
+}

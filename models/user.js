@@ -26,6 +26,10 @@ module.exports = class user extends Sequelize.Model {
           type: Sequelize.STRING(30),
           allowNull: true,
         },
+        snsProvider: {
+          type: Sequelize.STRING(10),
+          allowNull: true,
+        },
       },
       {
         sequelize,

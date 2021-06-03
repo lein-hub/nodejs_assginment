@@ -16,9 +16,25 @@ router.use((req, res, next) => {
   next();
 });
 
-router.get('/profile', isLoggedIn, (req, res) => {
-  res.render('profile', { title: '내 정보 - NodeBird' });
+router.get('/profile', isLoggedIn, async (req, res) => {
+  const user = await User.findOne({
+    where: { id: req.user.id },
+  });
+  res.render('profile', {
+    title: '내 정보 - NodeBird',
+    user,
+  });
 }); // GET /profile 요청 처리
+
+router.get('/profile/password', isLoggedIn, async (req, res) => {
+  const user = await User.findOne({
+    where: { id: req.user.id },
+  });
+  res.render('password', {
+    title: '내 정보 - NodeBird',
+    user,
+  });
+}); // GET /profile/password 요청 처리
 
 router.get('/join', isNotLoggedIn, (req, res) => {
   res.render('join', { title: '회원가입 - NodeBird' });
@@ -56,6 +72,10 @@ router.get('/qna', async (req, res, next) => {
         model: User,
         attributes: ['id', 'nick'],
       },
+      // include: {
+      //   model: Comment.findAndCountAll({}),
+      //   attributes: ['count'],
+      // },
       order: [['createdAt', 'DESC']],
       offset: offset,
       limit: postNum,
@@ -82,19 +102,32 @@ router.get('/qna', async (req, res, next) => {
 
 router.get('/qna/:postId', async (req, res, next) => {
   try {
-    const post = await Post.findOne({
+    let post = await Post.findOne({
       include: {
         model: User,
         attributes: ['id', 'nick'],
       },
       where: { id: req.params.postId },
     });
-    const date = dayjs(post.createdAt).format('YYYY-MM-DD');
+    let comments = await Comment.findAll({
+      include: {
+        model: User,
+        attributes: ['nick'],
+      },
+      where: { postId: req.params.postId },
+    });
+    comments = comments.map(comment => {
+      comment.dataValues.createdAt = dayjs(comment.dataValues.createdAt).format(
+        'YYYY-MM-DD hh:mm',
+      );
+      return comment;
+    });
     res.render('content', {
       title: '자주 묻는 질문 - NodeBird',
       menu: 'Q & A',
       post,
-      date,
+      comments,
+      date: dayjs(post.createdAt).format('YYYY-MM-DD'),
     });
   } catch (error) {
     console.error(error);
@@ -104,7 +137,7 @@ router.get('/qna/:postId', async (req, res, next) => {
 
 router.post('/qna/:postId/comment', async (req, res, next) => {
   try {
-    const comment = await Comment.create({
+    await Comment.create({
       content: req.body.content,
       UserId: req.user.id,
       PostId: req.params.postId,

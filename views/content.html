@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="head border-bottom mt-5">
-    <p class="col-md-10 h1 d-inline-block">{{post.title}}</p>
+    <p class="col-md-10 h1 d-inline-block">{{post.dataValues.title}}</p>
     <div class="justify-content-end col-md-2 d-inline">{{date}}</div>
 </div>
 
@@ -15,11 +15,19 @@
         <button type="button" id="neg" class="recbtn btn btn-danger btn-lg">비추천<br>0</button>
     </form>
 </div>
+<div class="commentsBox">
+    {% for comment in comments %}
+    <div class="border-bottom">
+        <p class="d-inline me-3">{{comment.User.nick}}</p><span>{{comment.createdAt}}</span>
+        <p><pre>{{comment.content}}</pre></p>
+    </div>
+    {% endfor %}
+</div>
 
-<div class="commentBox">
+<div class="commentForm">
     <form action="/qna/{{post.id}}/comment" method="post">
         <label for="exampleFormControlTextarea1" class="form-label">댓글 쓰기</label>
-        <textarea class="form-control d-inline" name="content" id="exampleFormControlTextarea1" rows="2" required></textarea>
+        <textarea class="form-control form-control-sm d-inline" name="content" id="exampleFormControlTextarea1" style="height: 100px" required></textarea>
         <button type="submit" class="btn btn-primary">등록</button>
     </form>
 </div>
