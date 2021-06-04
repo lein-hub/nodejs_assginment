@@ -14,9 +14,7 @@
     {% block content %}
     {% endblock %}
 
-    {% block script %}
-    {% endblock %}
-      
+    
     
     <footer class="my-5 text-muted text-center text-small">
       <p class="mb-1">© lein-hub 2017–2021</p>
@@ -26,5 +24,9 @@
         <li class="list-inline-item"><a href="#">Support</a></li>
       </ul>
     </footer>
-</body>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    {% block script %}
+    {% endblock %}
+  </body>
 </html>

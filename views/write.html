@@ -1,14 +1,23 @@
 {% extends 'layout.html' %}
 {% block content %}
+{% if isEdit %}
+<form id="login-form" action="/post/edit" method="post">
+    <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
+{% else %}
 <form id="login-form" action="/post" method="post">
+{% endif %}
 <div class="mb-3">
     <label for="exampleFormControlInput1" class="form-label">제목</label>
-    <input type="text" class="form-control" name="title" id="exampleFormControlInput1" placeholder="제목을 입력하세요" required>
+    <input type="text" class="form-control" name="title" id="exampleFormControlInput1" value="{{post.title}}" placeholder="제목을 입력하세요" required>
 </div>
 <div class="mb-3">
     <label for="exampleFormControlTextarea1" class="form-label">내용</label>
-    <textarea class="form-control" name="content" id="exampleFormControlTextarea1" rows="15" required></textarea>
+    <textarea class="form-control" name="content" id="exampleFormControlTextarea1" rows="15" required>{{post.content}}</textarea>
 </div>
+{% if isEdit %}
+<button type="submit" class="btn btn-primary">수정 완료</button>
+{% else %}
 <button type="submit" class="btn btn-primary">글쓰기</button>
+{% endif %}
 </form>
 {% endblock %}

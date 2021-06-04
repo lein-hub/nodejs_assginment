@@ -52,7 +52,7 @@ nunjucks.configure('views', {
 });
 
 sequelize
-  .sync({ alter: true }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
+  .sync({ force: false }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
   .then(() => {
     console.log('DB 서버 연결 성공');
   })
@@ -69,7 +69,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(
   morgan('dev'),
   express.json(),
-  express.urlencoded({ extended: false }),
+  express.urlencoded({ extended: true }),
   cookieParser(process.env.COOKIE_SECRET),
   session({
     resave: false,
@@ -96,9 +96,11 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  // 에러처리 미들웨어
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
-  res.status(500).send(err.message);
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 app.listen(app.get('port'), () => {

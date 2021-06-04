@@ -49,4 +49,36 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
   }
 });
 
+router.post('/edit', isLoggedIn, async (req, res, next) => {
+  try {
+    await Post.update(
+      {
+        title: req.body.title,
+        content: req.body.content,
+      },
+      {
+        where: { id: req.body.postId },
+      },
+      res.redirect(`/qna/${req.body.postId}`),
+    );
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.post('/delete', isLoggedIn, async (req, res, next) => {
+  try {
+    await Post.destroy(
+      {
+        where: { id: req.body.postId },
+      },
+      res.redirect('/qna/'),
+    );
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 module.exports = router;

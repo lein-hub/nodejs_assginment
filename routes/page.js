@@ -1,10 +1,9 @@
 const express = require('express');
-const { Op } = require('sequelize');
 const router = express.Router();
 const dayjs = require('dayjs');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const { Post, User, Comment } = require('../models');
-const { CLIEngine } = require('eslint');
+const bcrypt = require('bcrypt');
 
 router.use((req, res, next) => {
   // 라우터에서 사용되는 미들웨어 정의
@@ -26,7 +25,40 @@ router.get('/profile', isLoggedIn, async (req, res) => {
   });
 }); // GET /profile 요청 처리
 
-router.get('/profile/password', isLoggedIn, async (req, res) => {
+router.post('/profile', isLoggedIn, async (req, res, next) => {
+  const user = await User.findOne({
+    where: { id: req.user.id },
+  });
+
+  const result = await bcrypt.compare(req.body.password, user.password);
+
+  if (result) {
+    await User.update(
+      {
+        nick: req.body.nick,
+        snsId: req.body.snsId == '' ? null : req.body.snsId,
+        snsProvider:
+          req.body.snsProvider == '선택' ? null : req.body.snsProvider,
+      },
+      {
+        where: { id: req.user.id },
+      },
+      console.log(req.body.snsPr),
+      res.redirect('/'),
+    )
+      .then(result => {
+        res.json(result);
+      })
+      .catch(err => {
+        console.error(err);
+        next(err);
+      });
+  } else {
+    res.redirect('/profile');
+  }
+});
+
+router.get('/password', isLoggedIn, async (req, res) => {
   const user = await User.findOne({
     where: { id: req.user.id },
   });
@@ -35,6 +67,80 @@ router.get('/profile/password', isLoggedIn, async (req, res) => {
     user,
   });
 }); // GET /profile/password 요청 처리
+
+// router.post('/password', isLoggedIn, async (req, res, next) => {
+//   const user = await User.findOne({
+//     where: { id: req.user.id },
+//   });
+
+//   const result = await bcrypt.compare(req.body.thisPassword, user.password);
+//   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+//   console.log(result);
+//   if (result) {
+//     const newPassword = await bcrypt.hash(req.body.newPassword1, 12);
+//     await User.update(
+//       {
+//         password: newPassword,
+//       },
+//       {
+//         where: { id: req.user.id },
+//       },
+//       res.redirect('/'),
+//     )
+//       .then(result => {
+//         res.json(result);
+//       })
+//       .catch(err => {
+//         console.error(err);
+//         next(err);
+//       });
+//   } else {
+//     console.log('땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡');
+//     res.redirect('/profile/password');
+//   }
+// });
+
+router.post('/password', isLoggedIn, async (req, res, next) => {
+  console.log('@@@@@@@@@@@@@@@@@@@@@');
+  const newPw1 = req.body.newPassword1;
+  console.log(newPw1);
+
+  const newPassword = await bcrypt.hash(newPw1, 12);
+  await User.update(
+    {
+      password: newPassword,
+    },
+    {
+      where: { id: req.user.id },
+    },
+    res.redirect('/'),
+  )
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
+
+router.post('/passwordCheck', isLoggedIn, async (req, res, next) => {
+  const thisPw = req.body.thisPw;
+
+  const user = await User.findOne({
+    where: { id: req.user.id },
+  });
+
+  const isSame = await bcrypt.compare(thisPw, user.password);
+  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+  console.log(isSame);
+  if (isSame) {
+    res.json({ result: true });
+  } else {
+    console.log('땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡');
+    res.json({ result: false });
+  }
+});
 
 router.get('/join', isNotLoggedIn, (req, res) => {
   res.render('join', { title: '회원가입 - NodeBird' });
@@ -48,6 +154,7 @@ router.get('/bio', (req, res) => {
 }); // GET /bio 요청 처리
 
 router.get('/global', (req, res) => {
+  // res.json({ result: true });
   res.render('global', {
     title: '현지학기제 - NodeBird',
     menu: '현지학기제',
@@ -135,7 +242,7 @@ router.get('/qna/:postId', async (req, res, next) => {
   }
 }); // GET /qna 요청 처리
 
-router.post('/qna/:postId/comment', async (req, res, next) => {
+router.post('/qna/:postId/comment', isLoggedIn, async (req, res, next) => {
   try {
     await Comment.create({
       content: req.body.content,
@@ -148,10 +255,40 @@ router.post('/qna/:postId/comment', async (req, res, next) => {
   }
 });
 
-router.get('/write', isLoggedIn, (req, res) => {
+// router.post('/test', async (req, res, next) => {
+//   try {
+//     const test = await Comment.create({
+//       content: 'aaa',
+//       UserId: req.user.id,
+//       PostId: '1',
+//     });
+//     res.json(test);
+//   } catch (error) {
+//     console.error(error);
+//     next(error);
+//   }
+// });
+
+router.get('/write', isLoggedIn, async (req, res, next) => {
+  const postId = req.headers.postid;
+  let post;
+  let isEdit = false;
+  if (postId != null) {
+    isEdit = true;
+    try {
+      post = await Post.findOne({
+        where: { id: postId },
+      });
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  }
   res.render('write', {
     title: '자주 묻는 질문 - NodeBird',
     menu: 'Q & A',
+    post,
+    isEdit,
   });
 }); // GET /write 요청 처리
 

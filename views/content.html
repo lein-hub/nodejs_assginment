@@ -22,6 +22,17 @@
         <p><pre>{{comment.content}}</pre></p>
     </div>
     {% endfor %}
+
+    {% if post.User.id == user.id %}
+    <form id="edit-form" class="d-inline">
+        <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
+        <button type="submit" class="btn btn-primary" id="edit-content">수정</button>
+    </form>
+    <form id="delete-form" class="d-inline" action="/post/delete" method="POST" onsubmit="return check()">
+        <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
+        <button type="submit" class="btn btn-danger" id="delete-content">삭제</button>
+    </form>
+    {% endif %}
 </div>
 
 <div class="commentForm">
@@ -37,9 +48,16 @@
 <script>
 document.querySelector('#pos').addEventListener("click", recommend);
 document.querySelector('#neg').addEventListener("click", recommend);
-
+function check() {
+   if (confirm('정말 삭제하시겠습니까?')) {
+       return true;
+   } else {
+       return false;
+   }
+}
 function recommend() {
   alert ("Hello World!");
 }
 </script>
+<script src="/public/sequelize.js"></script>
 {% endblock %}
