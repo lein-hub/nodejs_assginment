@@ -6,7 +6,7 @@ module.exports = class user extends Sequelize.Model {
       {
         email: {
           type: Sequelize.STRING(40),
-          allowNull: true,
+          allowNull: false,
           unique: true,
         },
         nick: {
@@ -28,6 +28,26 @@ module.exports = class user extends Sequelize.Model {
         },
         snsProvider: {
           type: Sequelize.STRING(10),
+          allowNull: true,
+        },
+        interest: {
+          type: Sequelize.TEXT,
+          allowNull: true,
+        },
+        occupation: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
+        webSite: {
+          type: Sequelize.TEXT,
+          allowNull: true,
+        },
+        address: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
+        selfIntro: {
+          type: Sequelize.TEXT,
           allowNull: true,
         },
       },

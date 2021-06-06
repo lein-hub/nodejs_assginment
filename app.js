@@ -52,7 +52,7 @@ nunjucks.configure('views', {
 });
 
 sequelize
-  .sync({ force: false }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
+  .sync({ alter: false }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
   .then(() => {
     console.log('DB 서버 연결 성공');
   })
@@ -62,6 +62,7 @@ sequelize
 
 // app.use(morgan('dev'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/img', express.static(path.join(__dirname, 'uploads')));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser(process.env.COOKIE_SECRET));

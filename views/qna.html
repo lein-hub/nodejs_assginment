@@ -21,7 +21,7 @@
           <a href="/qna/{{post.id}}">{{post.title}}</a>
           <span>{{post.Comment.count}}</span>
         </td>
-        <td class="text-center">{{post.User.nick}}</td>
+        <td class="text-center"><a href="/u/{{post.UserId}}">{{post.User.nick}}</a></td>
         <td class="text-center">{{post.createdAt}}</td>
       </tr>
     {% endfor %}

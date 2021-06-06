@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container emp-profile">
+    <form method="post">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="profile-img">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt=""/>
+                    <div class="file btn btn-lg btn-primary">
+                        Change Photo
+                        <input type="file" name="file"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="profile-head">
+                            <h5>
+                                {{pageUser.nick}}
+                            </h5>
+                            <h6>
+                                {{pageUser.selfIntro}}
+                            </h6>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="content-tab" data-toggle="tab" href="#content?page=1" role="tab" aria-controls="home" aria-selected="true">내가 쓴 글</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="comment-tab" data-toggle="tab" href="#comment?page=1" role="tab" aria-controls="profile" aria-selected="false">내가 쓴 댓글</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-2">
+                {% if pageUser.id == user.id %}
+                <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="profile-work">
+                    <p>Info</p>
+                    {% if pageUser.address %}
+                    <i class="bi bi-geo-alt" alt="location"></i><span> {{pageUser.address}}</span><br/>
+                    {% endif %}
+                    {% if pageUser.interest %}
+                    <i class="bi bi-heart"></i><span> {{pageUser.interest}}</span><br/>
+                    {% endif %}
+                    {% if pageUser.occupation %}
+                    <i class="bi bi-briefcase"></i></i><span> {{pageUser.occupation}}</span><br/>
+                    {% endif %}
+                    {% if pageUser.snsId %}
+                        {% if pageUser.snsProvider == 'instagram' %}
+                        <i class="bi bi-instagram"></i>
+                        {% elif pageUser.snsProvider == 'facebook' %}
+                        <i class="bi bi-facebook"></i>
+                        {% else %}
+                        <i class="bi bi-twitter"></i>
+                        {% endif %}
+                    <span> {{pageUser.snsId}}</span><br/>
+                    {% endif %}
+                    {% if pageUser.webSite %}
+                    <i class="bi bi-globe2"></i><span> {{pageUser.webSite}}</span><br/>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-8">
+                <table class="table table-hover">
+                <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">제목</th>
+                      <th class="text-center" scope="col">글쓴이</th>
+                      <th class="text-center" scope="col">날짜</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for post in posts %}
+                      <tr class="conTable">
+                        <th scope="row">{{post.id}}</th>
+                        <td>
+                          <a href="/qna/{{post.id}}">{{post.title}}</a>
+                          <span>{{post.Comment.count}}</span>
+                        </td>
+                        <td class="text-center">{{post.User.nick}}</td>
+                        <td class="text-center">{{post.createdAt}}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </form>           
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    console.log({{pageUser}});
+</script>
+{% endblock %}

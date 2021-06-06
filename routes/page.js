@@ -26,36 +26,30 @@ router.get('/profile', isLoggedIn, async (req, res) => {
 }); // GET /profile 요청 처리
 
 router.post('/profile', isLoggedIn, async (req, res, next) => {
-  const user = await User.findOne({
-    where: { id: req.user.id },
-  });
-
-  const result = await bcrypt.compare(req.body.password, user.password);
-
-  if (result) {
-    await User.update(
-      {
-        nick: req.body.nick,
-        snsId: req.body.snsId == '' ? null : req.body.snsId,
-        snsProvider:
-          req.body.snsProvider == '선택' ? null : req.body.snsProvider,
-      },
-      {
-        where: { id: req.user.id },
-      },
-      console.log(req.body.snsPr),
-      res.redirect('/'),
-    )
-      .then(result => {
-        res.json(result);
-      })
-      .catch(err => {
-        console.error(err);
-        next(err);
-      });
-  } else {
-    res.redirect('/profile');
-  }
+  await User.update(
+    {
+      nick: req.body.nick,
+      snsId: req.body.snsId == '' ? null : req.body.snsId,
+      snsProvider: req.body.snsProvider == '선택' ? null : req.body.snsProvider,
+      address: req.body.address == '' ? null : req.body.address,
+      interest: req.body.interest == '' ? null : req.body.interest,
+      occupation: req.body.occupation == '' ? null : req.body.occupation,
+      webSite: req.body.webSite == '' ? null : req.body.webSite,
+      selfIntro: req.body.selfIntro == '' ? null : req.body.selfIntro,
+    },
+    {
+      where: { id: req.user.id },
+    },
+    console.log(req.body.snsPr),
+    res.redirect('/'),
+  )
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
 });
 
 router.get('/password', isLoggedIn, async (req, res) => {
@@ -101,9 +95,7 @@ router.get('/password', isLoggedIn, async (req, res) => {
 // });
 
 router.post('/password', isLoggedIn, async (req, res, next) => {
-  console.log('@@@@@@@@@@@@@@@@@@@@@');
   const newPw1 = req.body.newPassword1;
-  console.log(newPw1);
 
   const newPassword = await bcrypt.hash(newPw1, 12);
   await User.update(
@@ -124,7 +116,7 @@ router.post('/password', isLoggedIn, async (req, res, next) => {
     });
 });
 
-router.post('/passwordCheck', isLoggedIn, async (req, res, next) => {
+router.post('/passwordCheck', isLoggedIn, async (req, res) => {
   const thisPw = req.body.thisPw;
 
   const user = await User.findOne({
@@ -132,12 +124,9 @@ router.post('/passwordCheck', isLoggedIn, async (req, res, next) => {
   });
 
   const isSame = await bcrypt.compare(thisPw, user.password);
-  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-  console.log(isSame);
   if (isSame) {
     res.json({ result: true });
   } else {
-    console.log('땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡');
     res.json({ result: false });
   }
 });
@@ -146,12 +135,56 @@ router.get('/join', isNotLoggedIn, (req, res) => {
   res.render('join', { title: '회원가입 - NodeBird' });
 }); // GET /join 요청 처리
 
-router.get('/bio', (req, res) => {
-  res.render('bio', {
-    title: '자기소개 - NodeBird',
-    menu: '자기소개',
-  });
+router.get('/bio', isLoggedIn, (req, res) => {
+  res.redirect(`/u/${req.user.id}`);
 }); // GET /bio 요청 처리
+
+router.get('/u/:userId', async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      where: { id: req.params.userId },
+    });
+
+    let pageNum = req.query.page; // 요청 페이지 넘버
+    let offset = 0;
+    let counts = [];
+    const postNum = 10;
+    const end = (await Post.findAndCountAll()).count / (postNum + 1);
+    for (let i = 0; i <= end; i++) counts[i] = i + 1;
+
+    if (pageNum > 1) {
+      offset = postNum * (pageNum - 1);
+    }
+
+    let posts = await Post.findAll({
+      include: {
+        model: User,
+        attributes: ['id', 'nick'],
+      },
+      order: [['createdAt', 'DESC']],
+      offset: offset,
+      limit: postNum,
+      where: { UserId: req.params.userId },
+    });
+
+    posts = posts.map(post => {
+      post.dataValues.createdAt = dayjs(post.dataValues.createdAt).format(
+        'YYYY-MM-DD',
+      );
+      return post;
+    });
+
+    res.render('userpage', {
+      title: `${user.nick}님의 마이페이지 - NodeBird`,
+      menu: '마이페이지',
+      pageUser: user,
+      posts,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
 
 router.get('/global', (req, res) => {
   // res.json({ result: true });
@@ -292,7 +325,7 @@ router.get('/write', isLoggedIn, async (req, res, next) => {
   });
 }); // GET /write 요청 처리
 
-router.get('/', (req, res, next) => {
+router.get('/', (req, res) => {
   res.render('main', {
     // main.html 화면 만들어라
     title: '메인 - NodeBird',
