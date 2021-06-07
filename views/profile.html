@@ -35,6 +35,8 @@
             <div class="col-md-7 col-lg-8">
                 <h4 class="mb-3">내 정보</h4>
                 <div class="row g-3">
+                    
+                    
                     <div class="col-sm-6">
                         <label for="userId" class="form-label">아이디</label>
                         <input type="text" class="form-control" id="email" placeholder="" name="email" value="{{user.email}}" disabled>
@@ -96,14 +98,29 @@
                     <input type="text" class="form-control" name="webSite" value="{{user.webSite}}" id="webSite">
                   </div>
 
-                  </div>
+                </div>
+
+                <div class="col-sm-12 mt-3">
+                    <div class="img-preview">
+                        <label for="nickName" class="form-label d-block">프로필 사진</label>
+                        {% if user.avatar %}
+                        {% set imgSource = user.avatar %}
+                        {% else %}
+                        {% set imgSource = '/public/empty.png' %}
+                        {% endif %}
+                        <img id="img-preview" src="{{imgSource}}" style="display: inline;" width="250" alt="미리보기">
+                        <input id="img-url" type="hidden" name="url">
+                    </div>
+                    <div>
+                        <label id="img-label" for="img">사진 업로드</label>
+                        <input id="img" type="file" accept="image/*">
+                    </div>
+                </div>
       
-                  
-      
-                <hr class="my-4">
+              <hr class="my-4">
     
-                <input class="w-100 btn btn-primary btn-lg" onclick="return check()" id="submit-btn" type="submit" value="저장하고 메인으로">
-            </div>
+            <input class="w-100 btn btn-primary btn-lg" onclick="return check()" id="submit-btn" type="submit" value="저장하고 메인으로">
+          </div>
         </div>
     </form>
     </main>
@@ -172,4 +189,23 @@
             }
         });
       </script>
+      <script>
+          document.getElementById('img-url').value = document.getElementById('img-preview').src;
+        if (document.getElementById('img')) {
+          document.getElementById('img').addEventListener('change', function(e) {
+            const formData = new FormData();
+            console.log(this, this.files);
+            formData.append('img', this.files[0]);
+            axios.post('/post/img', formData)
+              .then((res) => {
+                document.getElementById('img-url').value = res.data.url;
+                document.getElementById('img-preview').src = res.data.url;
+                document.getElementById('img-preview').style.display = 'inline';
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          });
+        }
+    </script>
     {% endblock %}

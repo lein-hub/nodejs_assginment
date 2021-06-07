@@ -1,44 +1,20 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="container emp-profile">
-    <form method="post">
-        <div class="row">
-            <div class="col-md-4">
+<div class="container emp-profile row">
+    
+        <div class="col-md-4 d-inline-block">
+            <div class="col">
                 <div class="profile-img">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt=""/>
-                    <div class="file btn btn-lg btn-primary">
-                        Change Photo
-                        <input type="file" name="file"/>
-                    </div>
+                    {% if pageUser.avatar %}
+                    {% set imgSource = pageUser.avatar %}
+                    {% else %}
+                    {% set imgSource = '/public/empty.png' %}
+                    {% endif %}
+                    <img src="{{imgSource}}" alt=""/>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="profile-head">
-                            <h5>
-                                {{pageUser.nick}}
-                            </h5>
-                            <h6>
-                                {{pageUser.selfIntro}}
-                            </h6>
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="content-tab" data-toggle="tab" href="#content?page=1" role="tab" aria-controls="home" aria-selected="true">내가 쓴 글</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="comment-tab" data-toggle="tab" href="#comment?page=1" role="tab" aria-controls="profile" aria-selected="false">내가 쓴 댓글</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-2">
-                {% if pageUser.id == user.id %}
-                <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
+            <div class="col">
                 <div class="profile-work">
                     <p>Info</p>
                     {% if pageUser.address %}
@@ -61,11 +37,57 @@
                     <span> {{pageUser.snsId}}</span><br/>
                     {% endif %}
                     {% if pageUser.webSite %}
-                    <i class="bi bi-globe2"></i><span> {{pageUser.webSite}}</span><br/>
+                    <i class="bi bi-globe2"></i><span> <a href="{{pageUser.webSite}}">{{pageUser.webSite}}</a></span><br/>
                     {% endif %}
                 </div>
             </div>
-            <div class="col-md-8">
+        </div>
+        <div class="col-md-8 row">
+            <div class="col-md-9">
+                <div class="profile-head">
+                    <h5>
+                        {{pageUser.nick}}
+                    </h5>
+                    <h6>
+                        {{pageUser.selfIntro}}
+                        {% if pageUser.selfIntro == null %}
+                        등록된 소개말이 없습니다.
+                        {% endif %}
+                    </h6>
+                </div>
+            </div>
+            <div class="col-md-3">
+                {% if pageUser.id == user.id %}
+                <input type="button" onclick="location.href='/profile'" class="profile-edit-btn" name="btnAddMore" value="프로필 수정"/>
+                {% endif %}
+            </div>
+            <div class="profile-mid">
+                <ul class="nav nav-tabs m-0" id="myTab" role="tablist">
+                    {% if posts %}
+                    
+                        {% set p = 'true' %}
+                        {% set c = 'false' %}
+                        {% set pa = 'active' %}
+                        {% set ca = 'null' %}
+
+                    {% else %}
+                    
+                        {% set c = 'true' %}
+                        {% set p = 'false' %}
+                        {% set pa = 'null' %}
+                        {% set ca = 'active' %}
+
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link {{pa}}" id="content-tab" data-toggle="tab" href="?content=0&page=1" role="tab" aria-controls="home" aria-selected="{{p}}">내가 쓴 글</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ca}}" id="comment-tab" data-toggle="tab" href="?content=1&page=1" role="tab" aria-controls="profile" aria-selected="{{c}}">내가 쓴 댓글</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-12 p-0 m-0">
                 <table class="table table-hover">
                 <thead>
                     <tr>
@@ -87,17 +109,41 @@
                         <td class="text-center">{{post.createdAt}}</td>
                       </tr>
                     {% endfor %}
+
+                    {% for comment in comments %}
+                      <tr class="conTable">
+                        <th scope="row">{{comment.id}}</th>
+                        <td>
+                          <a href="/qna/{{comment.Post.id}}">{{comment.content}}</a>
+                        </td>
+                        <td class="text-center">{{comment.User.nick}}</td>
+                        <td class="text-center">{{comment.createdAt}}</td>
+                      </tr>
+                    {% endfor %}
                   </tbody>
                 </table>
             </div>
-        </div>
-    </form>           
+            <div class="text-center">
+                {% for num in Pcounts %}
+                {% if loop.index == page %}
+                <span class="pageThis">{{num}}</span>
+                {% else %}
+                <a class="pageNum" href="?content=0&page={{num}}">{{num}}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% for num in Ccounts %}
+                {% if loop.index == page %}
+                <span class="pageThis">{{num}}</span>
+                {% else %}
+                <a class="pageNum" href="?content=1&page={{num}}">{{num}}</a>
+                {% endif %}
+                {% endfor %}
+              </div>
+        </div>           
 </div>
 {% endblock %}
 
 
 {% block script %}
-<script>
-    console.log({{pageUser}});
-</script>
 {% endblock %}

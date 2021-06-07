@@ -7,8 +7,8 @@
 </div>
 
 
-<p>작성자: {{post.User.nick}}</p>
-<div><img src="{{post.dataValues.img}}" alt=""></div>
+<p>작성자: <a href="/u/{{post.User.id}}?content=0">{{post.User.nick}}</a></p>
+<div class="col-md-6"><img src="{{post.dataValues.img}}" alt="" width="100%"></div>
 <pre>{{post.content}}</pre>
 <div class="recbox text-center mt-5 pb-4 border-bottom">
     <form action="recommend" action="" method="post">
@@ -16,31 +16,37 @@
         <button type="button" id="neg" class="recbtn btn btn-danger btn-lg">비추천<br>0</button>
     </form>
 </div>
-<div class="commentsBox">
-    {% for comment in comments %}
-    <div class="border-bottom">
-        <p class="d-inline me-3">{{comment.User.nick}}</p><span>{{comment.createdAt}}</span>
-        <p><pre>{{comment.content}}</pre></p>
-    </div>
-    {% endfor %}
-
+<div>
     {% if post.User.id == user.id %}
     <form id="edit-form" class="d-inline">
         <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
         <button type="submit" class="btn btn-primary" id="edit-content">수정</button>
     </form>
     <form id="delete-form" class="d-inline" action="/post/delete" method="POST" onsubmit="return check()">
-        <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
         <button type="submit" class="btn btn-danger" id="delete-content">삭제</button>
     </form>
     {% endif %}
 </div>
+<div class="commentsBox">
+    {% for comment in comments %}
+    <form class="border-bottom comment" action="/post/editComment" onsubmit="window.location.reload();" method="post" name="{{comment.id}}">
+        <p class="d-inline me-3">{{comment.User.nick}}</p><span>{{comment.createdAt}}</span>
+        {% if post.User.id == user.id %}
+        <span class="ms-3"><a href="" class="comment-edit" name="{{comment.id}}" style="cursor:pointer">수정</a> <a href="" class="comment-delete" name="{{comment.id}}" style="cursor:pointer">삭제</a></span>
+        {% endif %}
+        <div id="comment-content-{{comment.id}}">
+            <p><pre>{{comment.content}}</pre></p>
+        </div>
+        <input type="text" class="visually-hidden" name="commentId" value="{{comment.id}}">
+    </form>
+    {% endfor %}
+</div>
 
 <div class="commentForm">
-    <form action="/qna/{{post.id}}/comment" method="post">
+    <form action="/qna/{{post.id}}/comment" id="comment-form" method="post">
         <label for="exampleFormControlTextarea1" class="form-label">댓글 쓰기</label>
         <textarea class="form-control form-control-sm d-inline" name="content" id="exampleFormControlTextarea1" style="height: 100px" required></textarea>
-        <button type="submit" class="btn btn-primary">등록</button>
+        <button type="submit" id="comment-btn" class="btn btn-primary">등록</button>
     </form>
 </div>
 {% endblock %}
@@ -61,17 +67,120 @@ function recommend() {
 }
 </script>
 <script>
-  document.getElementById('edit-form').addEventListener('submit', async e => {
-  e.preventDefault();
+    if (document.getElementById('edit-form')) {
+        document.getElementById('edit-form').addEventListener('submit', async e => {
+            e.preventDefault();
 
-  try {
-    const postId = e.target.postId.value;
+            try {
+                const postId = e.target.postId.value;
 
-    const res = await axios.get('/write', { headers: { postid: postId } });
-    document.write(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-});
+                const res = await axios.get('/write', { headers: { postid: postId } });
+                document.write(res.data);
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+  
+</script>
+<script>
+    document.getElementById('comment-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        document.getElementById('comment-form').submit();
+        const postId = document.getElementById('postId').value;
+        try {
+            const res = await axios.get(`/qna/${postId}`);
+        } catch (err) {
+            console.error(err);
+        }
+        
+        window.location.reload();
+    });
+</script>
+<script>
+    const deletes = document.getElementsByClassName('comment-delete');
+    async function ridder (e) {
+        e.preventDefault();
+
+        const commentId = this.getAttribute('name');
+        
+        try {
+            const res = await axios.post('/post/deleteComment', { commentId });
+            
+        } catch (err) {
+            console.error(err);
+        } finally {
+            window.location.reload();
+        }
+    };
+
+    for (var i = 0; i < deletes.length; i++) {
+        deletes[i].addEventListener('click', ridder); 
+    };
+</script>
+<script>
+    const edits = document.getElementsByClassName('comment-edit');
+    async function editor(e) {
+        e.preventDefault();
+        try {
+            const commentId = this.getAttribute('name');
+        
+            const res = await axios.post('/post/getComment', { commentId });
+
+            const commentBox = document.createElement('textarea');
+            commentBox.innerHTML = res.data.content;
+            commentBox.setAttribute('name', 'editContent');
+            commentBox.setAttribute('id', 'editContent');
+            commentBox.setAttribute('class', 'form-control form-control-sm d-inline');
+
+            const editConfirm = document.createElement('button');
+            editConfirm.setAttribute('class', 'btn btn-primary');
+            editConfirm.setAttribute('type', 'submit');
+            editConfirm.innerHTML = '수정 완료';
+            editConfirm.setAttribute('name', commentId);
+
+            const contentLine = document.getElementById(`comment-content-${commentId}`);
+            
+            while ( contentLine.hasChildNodes() ) {
+                contentLine.removeChild( contentLine.firstChild );
+            }
+            
+            contentLine.appendChild(commentBox);
+            contentLine.appendChild(editConfirm);
+
+        } catch (err) {
+            console.error(err);
+        }
+        
+    };
+
+    for (var i = 0; i < edits.length; i++) {
+        edits[i].addEventListener('click', editor); 
+    };
+
+</script>
+<script>
+    const commentForm = document.getElementsByClassName('comment');
+
+    async function submitEdittedComment(e) {
+        e.preventDefault();
+
+        const commentId = e.target.getAttribute('name');
+        const content = e.target.editContent.value;
+
+        try {
+            const res = await axios.post('/post/editComment', { commentId, content });
+            
+        } catch (err) {
+            console.error(err);
+        } finally {
+            window.location.reload();
+        }
+
+    }
+    
+    for (var i = 0; i < commentForm.length; i++) {
+        commentForm[i].addEventListener('submit', submitEdittedComment); 
+    };
 </script>
 {% endblock %}

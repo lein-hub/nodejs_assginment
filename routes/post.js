@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const { Post } = require('../models');
+const { Post, Comment } = require('../models');
 const isLoggedIn = require('./middlewares').isLoggedIn;
 
 const router = express.Router();
@@ -36,7 +36,7 @@ router.post('/img', isLoggedIn, upload.single('img'), (req, res) => {
 const upload2 = multer();
 router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
   try {
-    const post = await Post.create({
+    await Post.create({
       title: req.body.title,
       content: req.body.content,
       img: req.body.url,
@@ -67,6 +67,18 @@ router.post('/edit', isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.post('/getComment', isLoggedIn, async (req, res, next) => {
+  try {
+    const comment = await Comment.findOne({
+      where: { id: req.body.commentId },
+    });
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.post('/delete', isLoggedIn, async (req, res, next) => {
   try {
     await Post.destroy(
@@ -74,6 +86,37 @@ router.post('/delete', isLoggedIn, async (req, res, next) => {
         where: { id: req.body.postId },
       },
       res.redirect('/qna/'),
+    );
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.post('/deleteComment', isLoggedIn, async (req, res, next) => {
+  try {
+    await Comment.destroy({
+      where: { id: req.body.commentId },
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+  res.json({ result: true });
+});
+
+router.post('/editComment', isLoggedIn, async (req, res, next) => {
+  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+  console.log(req.body.commentId);
+  console.log(req.body.content);
+  try {
+    await Comment.update(
+      {
+        content: req.body.content,
+      },
+      {
+        where: { id: req.body.commentId },
+      },
     );
   } catch (error) {
     console.error(error);

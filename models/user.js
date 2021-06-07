@@ -50,6 +50,10 @@ module.exports = class user extends Sequelize.Model {
           type: Sequelize.TEXT,
           allowNull: true,
         },
+        avatar: {
+          type: Sequelize.STRING(200),
+          allowNull: true,
+        },
       },
       {
         sequelize,

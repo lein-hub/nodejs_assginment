@@ -36,6 +36,7 @@ router.post('/profile', isLoggedIn, async (req, res, next) => {
       occupation: req.body.occupation == '' ? null : req.body.occupation,
       webSite: req.body.webSite == '' ? null : req.body.webSite,
       selfIntro: req.body.selfIntro == '' ? null : req.body.selfIntro,
+      avatar: req.body.url == '' ? null : req.body.url,
     },
     {
       where: { id: req.user.id },
@@ -136,7 +137,7 @@ router.get('/join', isNotLoggedIn, (req, res) => {
 }); // GET /join 요청 처리
 
 router.get('/bio', isLoggedIn, (req, res) => {
-  res.redirect(`/u/${req.user.id}`);
+  res.redirect(`/u/${req.user.id}?content=0&page=1`);
 }); // GET /bio 요청 처리
 
 router.get('/u/:userId', async (req, res, next) => {
@@ -147,10 +148,25 @@ router.get('/u/:userId', async (req, res, next) => {
 
     let pageNum = req.query.page; // 요청 페이지 넘버
     let offset = 0;
-    let counts = [];
+    let Pcounts = [];
+    let Ccounts = [];
     const postNum = 10;
-    const end = (await Post.findAndCountAll()).count / (postNum + 1);
-    for (let i = 0; i <= end; i++) counts[i] = i + 1;
+    let end =
+      (
+        await Post.findAndCountAll({
+          where: { UserId: req.params.userId },
+        })
+      ).count /
+      (postNum + 1);
+    for (let i = 0; i <= end; i++) Pcounts[i] = i + 1;
+    end =
+      (
+        await Comment.findAndCountAll({
+          where: { UserId: req.params.userId },
+        })
+      ).count /
+      (postNum + 1);
+    for (let i = 0; i <= end; i++) Ccounts[i] = i + 1;
 
     if (pageNum > 1) {
       offset = postNum * (pageNum - 1);
@@ -167,6 +183,14 @@ router.get('/u/:userId', async (req, res, next) => {
       where: { UserId: req.params.userId },
     });
 
+    let comments = await Comment.findAll({
+      include: [{ all: true }],
+      order: [['createdAt', 'DESC']],
+      offset: offset,
+      limit: postNum,
+      where: { UserId: req.params.userId },
+    });
+
     posts = posts.map(post => {
       post.dataValues.createdAt = dayjs(post.dataValues.createdAt).format(
         'YYYY-MM-DD',
@@ -174,11 +198,30 @@ router.get('/u/:userId', async (req, res, next) => {
       return post;
     });
 
+    comments = comments.map(post => {
+      post.dataValues.createdAt = dayjs(post.dataValues.createdAt).format(
+        'YYYY-MM-DD',
+      );
+      return post;
+    });
+
+    if (req.query.content == 0) {
+      comments = null;
+      Ccounts = null;
+    } else {
+      posts = null;
+      Pcounts = null;
+    }
+
     res.render('userpage', {
       title: `${user.nick}님의 마이페이지 - NodeBird`,
       menu: '마이페이지',
       pageUser: user,
       posts,
+      comments,
+      Pcounts,
+      Ccounts,
+      page: pageNum,
     });
   } catch (error) {
     console.error(error);

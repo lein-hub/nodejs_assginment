@@ -52,7 +52,7 @@ nunjucks.configure('views', {
 });
 
 sequelize
-  .sync({ alter: false }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
+  .sync({ force: false }) // 테이블이 이미 있을 경우 강제로 덮어 씌우지 않겠다.
   .then(() => {
     console.log('DB 서버 연결 성공');
   })
