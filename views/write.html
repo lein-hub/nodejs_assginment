@@ -14,17 +14,22 @@
     <label for="exampleFormControlTextarea1" class="form-label">내용</label>
     <textarea class="form-control" name="content" id="exampleFormControlTextarea1" rows="15" required>{{post.content}}</textarea>
 </div>
-{% if isEdit %}
-<button type="submit" class="btn btn-primary">수정 완료</button>
+{% if post.img %}
+{% set imgSource = post.img %}
 {% else %}
+{% set imgSource = '/public/empty.png' %}
+{% endif %}
 <div>
     <label id="img-label" for="img">사진 업로드</label>
     <input id="img" type="file" accept="image/*">
 </div>
 <div class="img-preview">
-    <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
+    <img id="img-preview" src="{{imgSource}}" style="display: inline;" width="250" alt="미리보기">
     <input id="img-url" type="hidden" name="url">
-  </div>
+</div>
+{% if isEdit %}
+<button type="submit" class="btn btn-primary">수정 완료</button>
+{% else %}
 <button type="submit" class="btn btn-primary">글쓰기</button>
 {% endif %}
 </form>

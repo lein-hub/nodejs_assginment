@@ -242,7 +242,7 @@ router.get('/qna', async (req, res, next) => {
     let pageNum = req.query.page; // 요청 페이지 넘버
     let offset = 0;
     let counts = [];
-    const postNum = 20;
+    const postNum = 10;
     const end = (await Post.findAndCountAll()).count / (postNum + 1);
     for (let i = 0; i <= end; i++) counts[i] = i + 1;
 
@@ -295,7 +295,7 @@ router.get('/qna/:postId', async (req, res, next) => {
     let comments = await Comment.findAll({
       include: {
         model: User,
-        attributes: ['nick'],
+        attributes: ['id', 'nick'],
       },
       where: { postId: req.params.postId },
     });

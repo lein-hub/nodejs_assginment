@@ -17,9 +17,9 @@
     </form>
 </div>
 <div>
+    <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
     {% if post.User.id == user.id %}
     <form id="edit-form" class="d-inline">
-        <input class="visually-hidden" name="postId" id="postId" value="{{post.id}}">
         <button type="submit" class="btn btn-primary" id="edit-content">수정</button>
     </form>
     <form id="delete-form" class="d-inline" action="/post/delete" method="POST" onsubmit="return check()">
@@ -31,7 +31,7 @@
     {% for comment in comments %}
     <form class="border-bottom comment" action="/post/editComment" onsubmit="window.location.reload();" method="post" name="{{comment.id}}">
         <p class="d-inline me-3">{{comment.User.nick}}</p><span>{{comment.createdAt}}</span>
-        {% if post.User.id == user.id %}
+        {% if comment.User.id == user.id %}
         <span class="ms-3"><a href="" class="comment-edit" name="{{comment.id}}" style="cursor:pointer">수정</a> <a href="" class="comment-delete" name="{{comment.id}}" style="cursor:pointer">삭제</a></span>
         {% endif %}
         <div id="comment-content-{{comment.id}}">
@@ -72,7 +72,7 @@ function recommend() {
             e.preventDefault();
 
             try {
-                const postId = e.target.postId.value;
+                const postId = document.getElementById('postId').value;
 
                 const res = await axios.get('/write', { headers: { postid: postId } });
                 document.write(res.data);
@@ -106,7 +106,6 @@ function recommend() {
         
         try {
             const res = await axios.post('/post/deleteComment', { commentId });
-            
         } catch (err) {
             console.error(err);
         } finally {

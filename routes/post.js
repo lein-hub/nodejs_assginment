@@ -106,9 +106,6 @@ router.post('/deleteComment', isLoggedIn, async (req, res, next) => {
 });
 
 router.post('/editComment', isLoggedIn, async (req, res, next) => {
-  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-  console.log(req.body.commentId);
-  console.log(req.body.content);
   try {
     await Comment.update(
       {
