@@ -25,13 +25,15 @@
     <div class="row justify-content-center">
       <div class="col-md-6">
         <label for="inputPassword4" class="pw form-label">Password</label>
-        <input type="password" name="pw" class="form-control" id="join-password1" placeholder="비밀번호" required>
+        <input type="password" name="pw" oninput="return checkAvailable1()" class="form-control" id="join-password1" placeholder="비밀번호" required>
+        <p id="pw1-ann" style="color:red;"></p>
       </div>
     </div>
     <div class="row justify-content-center">
       <div class="col-md-6">
         <label for="inputPassword4" class="pw form-label">Password Confirm</label>
-        <input type="password" class="form-control" id="join-password2" placeholder="비밀번호 확인" required>
+        <input type="password" class="form-control" oninput="return checkAvailable2()" id="join-password2" placeholder="비밀번호 확인" required>
+        <p id="pw2-ann" style="color:red;"></p>
       </div>
     </div>
     <div class="row justify-content-center mt-3">
@@ -44,13 +46,43 @@
 </div>
 
     <script type="text/javascript">
+
       function test() {
         var p1 = document.getElementById('join-password1').value;
         var p2 = document.getElementById('join-password2').value;
+        var a1 = document.getElementById('pw1-ann').innerHTML;
+        var a2 = document.getElementById('pw2-ann').innerHTML;
         if( p1 != p2 ) {
-          alert("비밀번호가 일치 하지 않습니다");
+          alert("비밀번호가 일치하지 않습니다");
+          return false;
+        } else if (a1 || a2) {
+          alert("비밀번호 조건이 맞지 않습니다.");
           return false;
         }
+      }
+      function checkAvailable1() {
+        const passwordRule = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const pw1 = document.querySelector('#join-password1');
+        if (pw1.value == '') {
+          document.getElementById('pw1-ann').innerHTML = '';
+        } else if (!passwordRule.test(pw1.value)) {
+          document.getElementById('pw1-ann').innerHTML = '비밀번호는 최소 8 자, 최소 하나의 문자 및 숫자 조합이어야 합니다.';
+        } else {
+          document.getElementById('pw1-ann').innerHTML = '';
+        }
+      }
+      function checkAvailable2() {
+        var p1 = document.getElementById('join-password1').value;
+        var p2 = document.getElementById('join-password2').value;
+        if (p2 == '') {
+          document.getElementById('pw2-ann').innerHTML = '';
+        } else if( p1 != p2 ) {
+          document.getElementById('pw2-ann').innerHTML = '비밀번호가 일치하지 않습니다.';
+        } else {
+          document.getElementById('pw2-ann').innerHTML = '';
+        }
+
+        console.log(p2);
       }
     </script>
     <script>

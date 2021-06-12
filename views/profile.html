@@ -66,7 +66,7 @@
                         <li class="dropdown-item" onclick="setSNS(this.id)" id="twitter">Twitter</li>
                         <li class="dropdown-item" onclick="setSNS(this.id)" id="facebook">Facebook</li>
                         <li><hr class="dropdown-divider"></li>
-                        <li class="dropdown-item" onclick="setSNS(this.id)" id="선택"></li>
+                        <li class="dropdown-item" onclick="setSNS(this.id)" id="선택">선택</li>
                       </ul>
                       <input type="text" class="visually-hidden" name="snsProvider" id="snsPr" value="{{user.snsProvider}}">
                       <input type="text" class="form-control" aria-label="Text input with dropdown button" id="snsId" placeholder="SNS ID" name="snsId" value="{{user.snsId}}">
@@ -139,7 +139,7 @@
     </script>
     <script>
         document.getElementById('submit-btn').addEventListener('click', async e => {
-        //   e.preventDefault();
+          e.preventDefault();
 
           let id = document.getElementById('snsId').value;
           let btn = document.getElementById('snsBtn').innerHTML;
@@ -152,12 +152,12 @@
            }
 
            if (document.getElementById('snsId').value != ''
-           && document.getElementById('snsBtn').innerHTML == '선택') {
+           && document.getElementById('snsBtn').innerHTML.includes('선택')) {
                alert('SNS 종류를 선택해주세요');
                return false;
            }
             if (document.getElementById('snsId').value == ''
-           && document.getElementById('snsBtn').innerHTML != '선택') {
+           && !document.getElementById('snsBtn').innerHTML.includes('선택')) {
                alert('SNS ID를 입력해주세요');
                return false;
            }

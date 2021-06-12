@@ -11,6 +11,7 @@
       <th scope="col">제목</th>
       <th class="text-center" scope="col">글쓴이</th>
       <th class="text-center" scope="col">날짜</th>
+      <th class="text-center" scope="col">추천수</th>
     </tr>
   </thead>
   <tbody>
@@ -19,10 +20,15 @@
         <th scope="row">{{post.id}}</th>
         <td>
           <a href="/qna/{{post.id}}">{{post.title}}</a>
-          <span>{{post.Comment.count}}</span>
+          <span class="comment-count">
+            {% if post.Comments.length != 0 %}
+            [{{post.Comments.length}}]
+            {% endif %}
+          </span>
         </td>
         <td class="text-center"><a href="/u/{{post.UserId}}?content=0">{{post.User.nick}}</a></td>
         <td class="text-center">{{post.createdAt}}</td>
+        <td class="text-center">{{post.good - post.bad}}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -38,7 +44,7 @@
 </div>
     <div>
       <form id="write-qna" action="/write" method="get">
-      <button id="write-btn", type="menu" class="btn btn-primary">글쓰기</button>
+      <button id="write-btn" type="menu" class="btn btn-primary">글쓰기</button>
       </form>
     </div>
 </div>
@@ -46,5 +52,4 @@
 {% endblock %}
 
 {% block script %}
-
 {% endblock %}

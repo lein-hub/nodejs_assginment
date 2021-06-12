@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const dayjs = require('dayjs');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
-const { Post, User, Comment } = require('../models');
+const { Post, User, Comment, Vote } = require('../models');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const sequelize = require('sequelize');
 
 router.use((req, res, next) => {
   // 라우터에서 사용되는 미들웨어 정의
@@ -25,32 +27,41 @@ router.get('/profile', isLoggedIn, async (req, res) => {
   });
 }); // GET /profile 요청 처리
 
-router.post('/profile', isLoggedIn, async (req, res, next) => {
-  await User.update(
-    {
-      nick: req.body.nick,
-      snsId: req.body.snsId == '' ? null : req.body.snsId,
-      snsProvider: req.body.snsProvider == '선택' ? null : req.body.snsProvider,
-      address: req.body.address == '' ? null : req.body.address,
-      interest: req.body.interest == '' ? null : req.body.interest,
-      occupation: req.body.occupation == '' ? null : req.body.occupation,
-      webSite: req.body.webSite == '' ? null : req.body.webSite,
-      selfIntro: req.body.selfIntro == '' ? null : req.body.selfIntro,
-      avatar: req.body.url == '' ? null : req.body.url,
-    },
-    {
+router.post('/profile', isLoggedIn, async (req, res) => {
+  try {
+    let user = await User.findOne({
       where: { id: req.user.id },
-    },
-    console.log(req.body.snsPr),
-    res.redirect('/'),
-  )
-    .then(result => {
-      res.json(result);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
     });
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(req.body.url);
+    if (req.body.url && req.body.url != user.avatar) {
+      fs.unlink(`./uploads${user.avatar.slice(4)}`, err => {
+        if (err) {
+          console.log(err);
+        }
+        console.log('file deleted');
+      });
+    }
+    await User.update(
+      {
+        nick: req.body.nick,
+        snsId: req.body.snsId == '' ? null : req.body.snsId,
+        snsProvider: req.body.snsProvider == '' ? null : req.body.snsProvider,
+        address: req.body.address == '' ? null : req.body.address,
+        interest: req.body.interest == '' ? null : req.body.interest,
+        occupation: req.body.occupation == '' ? null : req.body.occupation,
+        webSite: req.body.webSite == '' ? null : req.body.webSite,
+        selfIntro: req.body.selfIntro == '' ? null : req.body.selfIntro,
+        avatar: req.body.url == '' ? null : req.body.url,
+      },
+      {
+        where: { id: req.user.id },
+      },
+      res.redirect('/'),
+    );
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.get('/password', isLoggedIn, async (req, res) => {
@@ -63,58 +74,24 @@ router.get('/password', isLoggedIn, async (req, res) => {
   });
 }); // GET /profile/password 요청 처리
 
-// router.post('/password', isLoggedIn, async (req, res, next) => {
-//   const user = await User.findOne({
-//     where: { id: req.user.id },
-//   });
-
-//   const result = await bcrypt.compare(req.body.thisPassword, user.password);
-//   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-//   console.log(result);
-//   if (result) {
-//     const newPassword = await bcrypt.hash(req.body.newPassword1, 12);
-//     await User.update(
-//       {
-//         password: newPassword,
-//       },
-//       {
-//         where: { id: req.user.id },
-//       },
-//       res.redirect('/'),
-//     )
-//       .then(result => {
-//         res.json(result);
-//       })
-//       .catch(err => {
-//         console.error(err);
-//         next(err);
-//       });
-//   } else {
-//     console.log('땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡땡');
-//     res.redirect('/profile/password');
-//   }
-// });
-
 router.post('/password', isLoggedIn, async (req, res, next) => {
-  const newPw1 = req.body.newPassword1;
+  try {
+    const newPw1 = req.body.newPassword1;
 
-  const newPassword = await bcrypt.hash(newPw1, 12);
-  await User.update(
-    {
-      password: newPassword,
-    },
-    {
-      where: { id: req.user.id },
-    },
-    res.redirect('/'),
-  )
-    .then(result => {
-      res.json(result);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
+    const newPassword = await bcrypt.hash(newPw1, 12);
+    await User.update(
+      {
+        password: newPassword,
+      },
+      {
+        where: { id: req.user.id },
+      },
+      res.redirect('/'),
+    );
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
 });
 
 router.post('/passwordCheck', isLoggedIn, async (req, res) => {
@@ -251,18 +228,22 @@ router.get('/qna', async (req, res, next) => {
     }
 
     let posts = await Post.findAll({
-      include: {
-        model: User,
-        attributes: ['id', 'nick'],
-      },
-      // include: {
-      //   model: Comment.findAndCountAll({}),
-      //   attributes: ['count'],
-      // },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'nick'],
+        },
+
+        {
+          model: Comment,
+          attributes: ['id'],
+        },
+      ],
       order: [['createdAt', 'DESC']],
       offset: offset,
       limit: postNum,
     });
+
     posts = posts.map(post => {
       post.dataValues.createdAt = dayjs(post.dataValues.createdAt).format(
         'YYYY-MM-DD',
@@ -331,19 +312,40 @@ router.post('/qna/:postId/comment', isLoggedIn, async (req, res, next) => {
   }
 });
 
-// router.post('/test', async (req, res, next) => {
-//   try {
-//     const test = await Comment.create({
-//       content: 'aaa',
-//       UserId: req.user.id,
-//       PostId: '1',
-//     });
-//     res.json(test);
-//   } catch (error) {
-//     console.error(error);
-//     next(error);
-//   }
-// });
+router.post('/vote', isLoggedIn, async (req, res, next) => {
+  try {
+    const vote = await Vote.findAndCountAll({
+      where: { PostId: req.query.postId, UserId: req.body.userId },
+    });
+
+    if (!vote.count) {
+      await Vote.create({
+        PostId: req.query.postId,
+        UserId: req.body.userId,
+      });
+      const post = await Post.findOne({
+        where: { id: req.query.postId },
+      });
+      await Post.update(
+        {
+          good: req.query.isPos == 1 ? post.good + 1 : post.good,
+          bad: req.query.isPos == 0 ? post.bad + 1 : post.bad,
+          // good: post.good + 1,
+          // bad: post.bad + 1,
+        },
+        {
+          where: { id: req.query.postId },
+        },
+      );
+      res.json({ result: true });
+    } else {
+      res.json({ result: false });
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
 
 router.get('/write', isLoggedIn, async (req, res, next) => {
   const postId = req.headers.postid;

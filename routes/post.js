@@ -51,10 +51,23 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
 
 router.post('/edit', isLoggedIn, async (req, res, next) => {
   try {
+    if (req.body.url) {
+      let post = await Post.findOne({
+        where: { id: req.body.postId },
+      });
+      fs.unlink(`./uploads${post.img.slice(4)}`, err => {
+        if (err) {
+          console.log(err);
+        }
+        console.log('file deleted');
+      });
+    }
+
     await Post.update(
       {
         title: req.body.title,
         content: req.body.content,
+        img: req.body.url,
       },
       {
         where: { id: req.body.postId },
@@ -79,8 +92,29 @@ router.post('/getComment', isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.post('/getCmtCnt', async (req, res, next) => {
+  try {
+    const comment = await Comment.findAndCountAll({
+      where: { PostId: req.body.postId },
+    });
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.post('/delete', isLoggedIn, async (req, res, next) => {
   try {
+    let post = await Post.findOne({
+      where: { id: req.body.postId },
+    });
+    fs.unlink(`./uploads${post.img.slice(4)}`, err => {
+      if (err) {
+        console.log(err);
+      }
+      console.log('file deleted');
+    });
     await Post.destroy(
       {
         where: { id: req.body.postId },

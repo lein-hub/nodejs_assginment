@@ -8,12 +8,12 @@
 
 
 <p>작성자: <a href="/u/{{post.User.id}}?content=0">{{post.User.nick}}</a></p>
-<div class="col-md-6"><img src="{{post.dataValues.img}}" alt="" width="100%"></div>
+<div class="col-md-12"><img class="content-img" src="{{post.dataValues.img}}" alt=""></div>
 <pre>{{post.content}}</pre>
 <div class="recbox text-center mt-5 pb-4 border-bottom">
     <form action="recommend" action="" method="post">
-        <button type="button" id="pos" class="recbtn btn btn-primary btn-lg">추천<br>0</button>
-        <button type="button" id="neg" class="recbtn btn btn-danger btn-lg">비추천<br>0</button>
+        <button type="button" id="pos" class="recbtn btn btn-primary btn-lg" name="{{user.id}}">추천<br>{{post.good}}</button>
+        <button type="button" id="neg" class="recbtn btn btn-danger btn-lg" name="{{user.id}}">비추천<br>{{post.bad}}</button>
     </form>
 </div>
 <div>
@@ -23,6 +23,7 @@
         <button type="submit" class="btn btn-primary" id="edit-content">수정</button>
     </form>
     <form id="delete-form" class="d-inline" action="/post/delete" method="POST" onsubmit="return check()">
+        <input class="visually-hidden" name="postId" value="{{post.id}}">
         <button type="submit" class="btn btn-danger" id="delete-content">삭제</button>
     </form>
     {% endif %}
@@ -62,8 +63,31 @@ function check() {
        return false;
    }
 }
-function recommend() {
-  alert ("Hello World!");
+async function recommend() {
+        const userId = this.getAttribute('name');
+        let isPos = 1;
+        let announce = '추천되었습니다.';
+        if (this !== document.querySelector('#pos')) {
+            isPos = 0;
+            announce = '비추천되었습니다.'
+        }
+        const postId = document.getElementById('postId').value;
+        console.log(`isPos = ${isPos}`);
+        console.log(`/vote?postId=${postId}&isPos=${isPos}`);
+        try {
+            const res = await axios.post(`/vote?postId=${postId}&isPos=${isPos}`, { userId });
+            console.log(res.data);
+            if (res.data.result) {
+                alert(announce);
+                window.location.reload();
+            } else if (res.data.result == false) {
+                alert('이미 추천/비추천 하셨습니다.');
+            } else {
+                document.write(res.data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
 }
 </script>
 <script>

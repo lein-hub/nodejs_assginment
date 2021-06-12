@@ -46,6 +46,14 @@
   width: 100px;
 }
 
+.conTable :nth-child(5) {
+  width: 80px;
+}
+
+.content-img {
+  max-width: 100%;
+}
+
 .recbtn {
   width: 100px;
 }
