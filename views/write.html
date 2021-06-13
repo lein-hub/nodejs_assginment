@@ -22,6 +22,7 @@
 <div>
     <label id="img-label" for="img">사진 업로드</label>
     <input id="img" type="file" accept="image/*">
+    <input type="button" id="img-del" value="삭제">
 </div>
 <div class="img-preview">
     <img id="img-preview" src="{{imgSource}}" style="display: inline;" width="250" alt="미리보기">
@@ -54,5 +55,11 @@
           });
       });
     }
+
+    document.getElementById('img-del').addEventListener('click', function(e) {
+      document.getElementById('img-url').value = 'DELETED';
+      document.getElementById('img-preview').src = '/public/empty.png';
+      document.getElementById('img-preview').style.display = 'inline';
+    });
 </script>
 {% endblock %}

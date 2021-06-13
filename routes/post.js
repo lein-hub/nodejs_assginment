@@ -51,11 +51,12 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
 
 router.post('/edit', isLoggedIn, async (req, res, next) => {
   try {
-    if (req.body.url) {
-      let post = await Post.findOne({
-        where: { id: req.body.postId },
-      });
-      fs.unlink(`./uploads${post.img.slice(4)}`, err => {
+    let posttt = await Post.findOne({
+      where: { id: req.body.postId },
+    });
+
+    if ((req.body.url && posttt.img) || req.body.url == 'DELETED') {
+      fs.unlink(`./uploads${posttt.img.slice(4)}`, err => {
         if (err) {
           console.log(err);
         }
@@ -67,7 +68,12 @@ router.post('/edit', isLoggedIn, async (req, res, next) => {
       {
         title: req.body.title,
         content: req.body.content,
-        img: req.body.url,
+        img:
+          req.body.url == ''
+            ? posttt.img
+            : req.body.url == 'DELETED'
+            ? ''
+            : req.body.url,
       },
       {
         where: { id: req.body.postId },

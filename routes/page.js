@@ -5,7 +5,6 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const { Post, User, Comment, Vote } = require('../models');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
-const sequelize = require('sequelize');
 
 router.use((req, res, next) => {
   // 라우터에서 사용되는 미들웨어 정의
@@ -22,7 +21,7 @@ router.get('/profile', isLoggedIn, async (req, res) => {
     where: { id: req.user.id },
   });
   res.render('profile', {
-    title: '내 정보 - NodeBird',
+    title: '내 정보 - NodeAssign',
     user,
   });
 }); // GET /profile 요청 처리
@@ -32,9 +31,7 @@ router.post('/profile', isLoggedIn, async (req, res) => {
     let user = await User.findOne({
       where: { id: req.user.id },
     });
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-    console.log(req.body.url);
-    if (req.body.url && req.body.url != user.avatar) {
+    if ((req.body.url && user.avatar) || req.body.url == 'DELETED') {
       fs.unlink(`./uploads${user.avatar.slice(4)}`, err => {
         if (err) {
           console.log(err);
@@ -52,7 +49,12 @@ router.post('/profile', isLoggedIn, async (req, res) => {
         occupation: req.body.occupation == '' ? null : req.body.occupation,
         webSite: req.body.webSite == '' ? null : req.body.webSite,
         selfIntro: req.body.selfIntro == '' ? null : req.body.selfIntro,
-        avatar: req.body.url == '' ? null : req.body.url,
+        avatar:
+          req.body.url == ''
+            ? user.avatar
+            : req.body.url == 'DELETED'
+            ? ''
+            : req.body.url,
       },
       {
         where: { id: req.user.id },
@@ -69,7 +71,7 @@ router.get('/password', isLoggedIn, async (req, res) => {
     where: { id: req.user.id },
   });
   res.render('password', {
-    title: '내 정보 - NodeBird',
+    title: '내 정보 - NodeAssign',
     user,
   });
 }); // GET /profile/password 요청 처리
@@ -110,7 +112,7 @@ router.post('/passwordCheck', isLoggedIn, async (req, res) => {
 });
 
 router.get('/join', isNotLoggedIn, (req, res) => {
-  res.render('join', { title: '회원가입 - NodeBird' });
+  res.render('join', { title: '회원가입 - NodeAssign' });
 }); // GET /join 요청 처리
 
 router.get('/bio', isLoggedIn, (req, res) => {
@@ -191,7 +193,7 @@ router.get('/u/:userId', async (req, res, next) => {
     }
 
     res.render('userpage', {
-      title: `${user.nick}님의 마이페이지 - NodeBird`,
+      title: `${user.nick}님의 마이페이지 - NodeAssign`,
       menu: '마이페이지',
       pageUser: user,
       posts,
@@ -209,7 +211,7 @@ router.get('/u/:userId', async (req, res, next) => {
 router.get('/global', (req, res) => {
   // res.json({ result: true });
   res.render('global', {
-    title: '현지학기제 - NodeBird',
+    title: '현지학기제 - NodeAssign',
     menu: '현지학기제',
   });
 }); // GET /global 요청 처리
@@ -251,7 +253,7 @@ router.get('/qna', async (req, res, next) => {
       return post;
     });
     res.render('qna', {
-      title: '자주 묻는 질문 - NodeBird',
+      title: '자주 묻는 질문 - NodeAssign',
       menu: 'Q & A',
       posts,
       counts,
@@ -287,7 +289,7 @@ router.get('/qna/:postId', async (req, res, next) => {
       return comment;
     });
     res.render('content', {
-      title: '자주 묻는 질문 - NodeBird',
+      title: '자주 묻는 질문 - NodeAssign',
       menu: 'Q & A',
       post,
       comments,
@@ -363,7 +365,7 @@ router.get('/write', isLoggedIn, async (req, res, next) => {
     }
   }
   res.render('write', {
-    title: '자주 묻는 질문 - NodeBird',
+    title: '자주 묻는 질문 - NodeAssign',
     menu: 'Q & A',
     post,
     isEdit,
@@ -373,7 +375,7 @@ router.get('/write', isLoggedIn, async (req, res, next) => {
 router.get('/', (req, res) => {
   res.render('main', {
     // main.html 화면 만들어라
-    title: '메인 - NodeBird',
+    title: '메인 - NodeAssign',
     menu: 'Menu',
   });
 }); // GET / 요청 처리

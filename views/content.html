@@ -31,7 +31,7 @@
 <div class="commentsBox">
     {% for comment in comments %}
     <form class="border-bottom comment" action="/post/editComment" onsubmit="window.location.reload();" method="post" name="{{comment.id}}">
-        <p class="d-inline me-3">{{comment.User.nick}}</p><span>{{comment.createdAt}}</span>
+        <p class="d-inline me-3"><a href="/u/{{comment.User.id}}?content=0">{{comment.User.nick}}</a></p><span>{{comment.createdAt}}</span>
         {% if comment.User.id == user.id %}
         <span class="ms-3"><a href="" class="comment-edit" name="{{comment.id}}" style="cursor:pointer">수정</a> <a href="" class="comment-delete" name="{{comment.id}}" style="cursor:pointer">삭제</a></span>
         {% endif %}
